@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Column Distillation Simulator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      text-align: center;
+    
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      text-align: center;
+      margin-bottom: 10px;
+      background-color: #81c20989;
+
+    }
+
+    .container {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 20px;
+    }
+
+    .input-section {
+      position: absolute;
+      bottom: 200px;
+      width: 250px;
+      left: 50px;
+      background-color: #f57535e1;
+      color: black;
+      padding: 15px;
+      border-radius: 15px;
+      z-index: 999;
+    }
+    .output-section {
+      position: absolute;
+      width: 250px;
+      bottom: 40px;
+      right: 40px;
+      background-color: rgba(152, 181, 35, 0.81);
+      color: black;
+      padding: 15px;
+      border-radius: 15px;
+      z-index: 999;
+    }
+
+
+    .input-group,
+    .output-group {
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      padding: 5px;
+      border-radius: 5px;
+      border: none;
+      width: 100%;
+    }
+
+    input[readonly] {
+      background-color: #eee;
+    }
+
+    .simulator {
+      text-align: center;
+      position: relative;
+      
+    }
+
+    .simulator img {
+      width: 500px;
+      height: auto;
+      border: 2px solid #ccc;
+      border-radius: 15px;
+      background-color: #3b3535;
+    }
+
+    .overlay-button {
+      position: absolute;
+      background-color: rgba(255, 255, 255, 0.8);
+      color: black;
+      padding: 5px 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: default;
+    }
+
+    /* Placeholder positions — adjust coordinates as needed */
+    #overlay1 {
+      top: 240px;
+      left:  284px;
+      background-color: rgba(255, 0, 0, 0.642);
+    }
+
+    #overlay2 {
+      top: 150px;
+      left: 400px;
+      background-color: rgba(0, 94, 255, 0.642);
+    }
+
+    #overlay3 {
+      top: 400px;
+      left: 400px;
+      background-color: rgba(166, 255, 0, 0.642);
+    }
+
+    .graphs-btn,
+    .set-btn {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #81c209;
+      border: none;
+      color: white;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  </style>
+  <!-- Load Chart.js for graph rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body style="background: url('{{ url_for('static', filename='cover3.jpg') }}') no-repeat center center fixed; background-size: cover;">
+  <canvas id="gasolineChart" width="300" height="200"
+          style="position: absolute; top: 40px; right: 20px; background:rgba(221, 225, 217, 0.93);color: black;
+                border-radius: 10px; box-shadow: 0 2px 6px rgb(255, 255, 255); padding: 10px;">
+  </canvas>
+  <h1>COLUMN DISTILLATION SIMULATOR</h1>
+  <h2>Team: Extract and Conquor</h2>
+
+  <div class="container">
+    <!-- Input Section -->
+    <div class="input-section">
+      <div class="input-group">
+        <label for="feed-rate">Feed Rate:</label>
+        <input type="number" step="any" id="feed-rate" value="100">
+      </div>
+      <div class="input-group">
+        <label for="feed-composition">Feed Composition:</label>
+        <input type="text" id="feed-composition" value="0.2, 0.4, 0.25, 0.15">
+      </div>
+      <div class="input-group">
+        <label for="q">q:</label>
+        <input type="number" step="any" id="q" value="0.7">
+      </div>
+      <div class="input-group">
+        <label for="temperature">Temperature (°C):</label>
+        <input type="number" step="any" id="temperature" value="120">
+      </div>
+      <div class="input-group">
+        <label for="distillate-purity">Distillate Purity:</label>
+        <input type="number" step="any" id="distillate-purity" value="0.8">
+      </div>
+      <button class="set-btn">SET</button>
+    </div>
+
+    <!-- Simulator Image -->
+    <div class="simulator">
+      <img src="{{ url_for('static', filename='distillation.png') }}" alt="Distillation Column Design">
+      <div class="overlay-button" id="overlay1">Temperature:</div>
+      <div class="overlay-button" id="overlay2">%Gasoline:</div>
+      <div class="overlay-button" id="overlay3">%Kerosene:</div>
+    </div>
+
+    <div class="output-section">
+      <div class="output-group">
+        <label for="distillate-rate">Distillate Flow Rate (D):</label>
+        <input type="number" step="any" id="distillate-rate" readonly>
+      </div>
+      <div class="output-group">
+        <label for="bottom-rate">Bottom Flow Rate (B):</label>
+        <input type="number" step="any" id="bottom-rate" readonly>
+      </div>
+      <div class="output-group">
+        <label for="distillate-comp">Distillate Composition:</label>
+        <input type="text" id="distillate-comp" readonly>
+      </div>
+      <div class="output-group">
+        <label for="bottom-comp">Bottom Composition:</label>
+        <input type="text" id="bottom-comp" readonly>
+      </div>
+      <div class="output-group">
+        <label for="nmin">N-min:</label>
+        <input type="number" step="any" id="nmin" readonly>
+      </div>
+      <div class="output-group">
+        <label for="rmin">R-min:</label>
+        <input type="number" step="any" id="rmin" readonly>
+      </div>
+      <button class="graphs-btn">GRAPHS</button>
+    </div>
+
+
+    <script>
+      document.querySelector(".graphs-btn").addEventListener("click", () => {
+        window.location.href = "/graphs";
+      });
+
+      document.querySelector(".set-btn").addEventListener("click", () => {
+        const feedRate = parseFloat(document.getElementById("feed-rate").value);
+        const feedCompStr = document.getElementById("feed-composition").value;
+        const feedCompArray = feedCompStr.split(",").map(val => parseFloat(val.trim()));
+        const q = parseFloat(document.getElementById("q").value);
+        const temperature = parseFloat(document.getElementById("temperature").value);
+        const distillatePurity = parseFloat(document.getElementById("distillate-purity").value);
+
+    
+        const data = {
+          feed_rate: feedRate,
+          feed_composition: feedCompArray,
+          q,
+          temperature,
+          distillate_purity: distillatePurity,
+        };
+    
+        // Start interval simulation loop
+        setInterval(async () => {
+          try {
+            const response = await fetch("/simulate", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data)
+            });
+    
+            const result = await response.json();
+    
+            // Update output fields with response data
+            document.getElementById("distillate-rate").value = result["Distillate Flow Rate"];
+            document.getElementById("bottom-rate").value = result["Bottom Flow Rate"];
+            document.getElementById("distillate-comp").value = result["Distillate Composition"].join(", ");
+            document.getElementById("bottom-comp").value = result["Bottom Composition"].join(", ");
+            document.getElementById("nmin").value = result["Minimum Theoretical Stages (Fenske)"];
+            document.getElementById("rmin").value = result["Minimum Reflux Ratio (Underwood)"];
+            // Update overlay values from backend
+            document.getElementById("overlay1").textContent = `Temperature: ${result["Temperature"].toFixed(2)} K`;
+            document.getElementById("overlay2").textContent = `%Gasoline: ${result["Gasoline %"].toFixed(2)}%`;
+            document.getElementById("overlay3").textContent = `%Kerosene: ${result["Kerosene %"].toFixed(2)}%`;
+            const gasolineAmount = result["Distillate Composition"][1] * result["Distillate Flow Rate"];
+            timeData.push(timeCounter++);
+            gasolineData.push(gasolineAmount);
+
+            // Keep last 50 points
+            if (timeData.length > 10) {
+              timeData.shift();
+              gasolineData.shift();
+            }
+
+            gasolineChart.update();
+    
+          } catch (error) {
+            console.error("Simulation failed:", error);
+            alert("Simulation failed: " + error.message);
+          }
+        }, 1000); // every 1 second
+      });
+      let timeCounter = 0;
+      const timeData = [];
+      const gasolineData = [];
+
+      const ctx = document.getElementById('gasolineChart').getContext('2d');
+      const gasolineChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: timeData,
+          datasets: [{
+            label: 'Gasoline Amount',
+            data: gasolineData,
+        
+            borderColor: 'rgba(255, 99, 132, 1)',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderWidth: 2,
+            tension: 0.3,
+            fill: true,
+          }]
+        },
+        options: {
+          responsive: false,
+          animation: false,
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Time (s)'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Gasoline Amount'
+              },
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+    </script>
+</body>
+</html>

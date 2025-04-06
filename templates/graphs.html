@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Process Graphs</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 30px;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr); /* Force 2 columns */
+      gap: 20px;
+      padding: 0 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .graph-card {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .graph-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .graph-title {
+      font-weight: bold;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Process Graphs (for given paramas)</h1>
+
+  <div class="gallery">
+    <div class="graph-card">
+      <img src="{{ url_for('static', filename='distillate.png') }}" alt="Graph 1">
+      <div class="graph-title">Distillate Composition</div>
+    </div>
+    <div class="graph-card">
+      <img src="{{ url_for('static', filename='bottom.png') }}" alt="Graph 2">
+      <div class="graph-title">Bottom Composition </div>
+    </div>
+    <div class="graph-card">
+      <img src="{{ url_for('static', filename='Nmin.png') }}" alt="Graph 3">
+      <div class="graph-title">Min. stages vs Purity of gasoline</div>
+    </div>
+    <div class="graph-card">
+      <img src="{{ url_for('static', filename='Rmin.png') }}" alt="Graph 4">
+      <div class="graph-title">Min. Reflux ratio vs Purity of Gasoline</div>
+    </div>
+  </div>
+
+</body>
+</html>
